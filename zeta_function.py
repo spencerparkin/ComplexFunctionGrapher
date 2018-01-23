@@ -26,5 +26,8 @@ def EtaFunction(z):
 def ZetaFunction(z):
     numer = EtaFunction(z)
     denom = 1.0 - 2.0 / (2.0 ** z)
-    result = numer / denom
+    try:
+        result = numer / denom
+    except ZeroDivisionError:
+        result = 0.0
     return result

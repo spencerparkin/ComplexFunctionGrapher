@@ -30,3 +30,6 @@
 
 # PyCharm project directory
 .idea/
+
+# Generated files...
+result.png
