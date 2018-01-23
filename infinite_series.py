@@ -3,43 +3,41 @@
 import cmath
 import math
 
-# TODO: Test our algorithm here with {1, -1, 1, -1, 1, -1, 1, -1, ...}.  Should get 1/2, approximately.
-
 class InfiniteSeries(object):
     def __init__(self):
-        self.partial_sums = []
-
+        self.epsilon = 1e-9
+        self.limit_count = 10
+        self.sum_count = 100
+    
     def Term(self, i):
-        return 0.0
+        raise Exception('Pure virtual call.')
+    
+    def ComputeSum(self):
+        # Note that not all sums are Cesaro summable.  In the case that this sum is
+        # not Cesaro summable, here we will loop indefinitely.  I'm okay with that,
+        # because I am only interested in the sums that are Cesaro summable.
+        sequence = []
+        sum = 0.0
+        for i in range(self.sum_count):
+            sum += self.Term(i)
+            sequence.append(sum)
+        while not self.ConvergentSequence(sequence):
+            new_sequence = []
+            sum = 0.0
+            for i in range(len(sequence)):
+                sum += sequence[i]
+                average = sum / float(i + 1)
+                new_sequence.append(average)
+            sequence = new_sequence
+        return sequence[len(sequence) - 1]
 
-    def PartialSum(self, i):
-        if i >= len(self.partial_sums):
-            j = len(self.partial_sums) - 1
-            while j < i:
-                self.partial_sums.append(self.partial_sum[j] + self.Term(j + 1))
-                j += 1
-        return self.partial_sums[i]
-
-    def ComputeSum(self, epsilon=1e-9, term_count=100, max_depth=10, depth=1):
-        # There is no proof of convergence here.  This is very approximate.
-        # Much of this is quite naive, I'm sure.
-        i = 1
-        for k in range(term_count):
-            j = i + 1
-            a = self.PartialSum(i)
-            b = self.PartialSum(j)
-            if math.fabs(a - b) < epsilon:
-                return b
-            i = j
-        if depth < max_depth:
-            cesaro_series = CesaroSeries(self)
-            return cesaro_series.ComputeSum(epsilon, term_count, max_depth, depth + 1)
-        return None
-
-class CesaroSeries(InfiniteSeries):
-    def __init__(self, series):
-        super().__init__()
-        self.series = series
-
-    def Term(self, i):
-        return self.series.PartialSum(i) / float(i)
+    def ConvergentSequence(self, sequence):
+        # We will approximate the given sequence to be convergent if the
+        # the last self.limit_count elements are within self.epsilon.
+        # There might be a proof in real analysis of the legitimacy of this
+        # approach, or it may as yet still be too naive.
+        approx_limit = sequence[len(sequence) - 1]
+        for i in range(len(sequence) - self.limit_count, len(sequence)):
+            if abs(sequence[i] - approx_limit) >= self.epsilon:
+                return False
+        return True
