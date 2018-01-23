@@ -1,7 +1,5 @@
 # zeta_function.py
 
-import cmath
-
 from infinite_series import InfiniteSeries
 
 class EtaFunctionSeries(InfiniteSeries):
@@ -11,18 +9,13 @@ class EtaFunctionSeries(InfiniteSeries):
 
     def Term(self, i):
         numer = 1.0
-        if i % 2 == 1:
+        if i % 2 == 0:
             numer = -1.0
 
-        #x^y = exp(log(x^y)) = exp(y log(x))
-
         try:
-            denom = complex(real=float(i)) ** self.z
+            denom = float(i) ** self.z
         except ZeroDivisionError:
             denom = 1.0
-        except Exception as ex:
-            error = str(ex)
-            error = None
 
         result = numer / denom
         return result

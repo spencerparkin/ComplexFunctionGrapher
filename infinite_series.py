@@ -4,21 +4,25 @@ class InfiniteSeries(object):
     def __init__(self):
         self.epsilon = 1e-3
         self.limit_count = 5
-        self.sum_count = 2000
+        self.sum_count = 20000
+        self.max_cesaro = 10
     
     def Term(self, i):
+        # Terms will be 1-based (e.g., a_1, a_2, a_3, etc.)
         raise Exception('Pure virtual call.')
     
     def ComputeSum(self):
-        # Note that not all sums are Cesaro summable.  In the case that this sum is
-        # not Cesaro summable, here we will loop indefinitely.  I'm okay with that,
-        # because I am only interested in the sums that are Cesaro summable.
+        # Note that not all sums are Cesaro summable.
         sequence = []
         sum = 0.0
-        for i in range(self.sum_count):
+        for i in range(1, self.sum_count + 1):
             sum += self.Term(i)
             sequence.append(sum)
+        j = 0
         while not self.ConvergentSequence(sequence):
+            j += 1
+            if j > self.max_cesaro:
+                raise Exception('Max cesaro (%d) reached.' % self.max_cesaro)
             new_sequence = []
             sum = 0.0
             for i in range(len(sequence)):
